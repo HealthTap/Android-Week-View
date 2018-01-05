@@ -51,5 +51,10 @@
         <attr name="verticalFlingEnabled" format="boolean"/>
         <attr name="allDayEventHeight" format="dimension"/>
         <attr name="scrollDuration" format="integer"/>
+        <attr name="showHalfHours" format="boolean" />
+        <attr name="showQuarterHours" format="boolean" />
+        <attr name="defaultEventBackgroundColor" format="color"/>
+
+
     </declare-styleable>
 </resources>
