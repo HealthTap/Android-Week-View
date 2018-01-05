@@ -54,6 +54,8 @@
         <attr name="showHalfHours" format="boolean" />
         <attr name="showQuarterHours" format="boolean" />
         <attr name="defaultEventBackgroundColor" format="color"/>
+        <attr name="headerTextTypeface" format="string"/>
+
 
 
     </declare-styleable>

@@ -150,6 +150,8 @@ public class WeekView extends View {
     private boolean showQuarterHours = false;
     private int mAllDayEventHeight = 100;
     private int mScrollDuration = 250;
+    private boolean mHeaderTextTypeface;
+
 
     // use this factor to multiply hour-fields in order to get half-hours or quarter-hours to show up
     private final int factor;
@@ -367,6 +369,9 @@ public class WeekView extends View {
             mScrollDuration = a.getInt(R.styleable.WeekView_scrollDuration, mScrollDuration);
 
             mDefaultEventColor = a.getColor(R.styleable.WeekView_defaultEventBackgroundColor, mDefaultEventColor);
+            mHeaderTextTypeface = a.getBoolean(R.styleable.WeekView_headerTextTypeface, mHeaderTextTypeface);
+
+
 
         } finally {
             a.recycle();
@@ -406,7 +411,16 @@ public class WeekView extends View {
         mHeaderTextPaint.setTextSize(mTextSize);
         mHeaderTextPaint.getTextBounds(exampleTime, 0, exampleTime.length(), rect);
         mHeaderTextHeight = rect.height();
-        mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+
+        if ("bold".equals(mHeaderTextTypeface)){
+            mHeaderTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        } else if ("sans-serif".equals(mHeaderTextTypeface)){
+            mHeaderTextPaint.setTypeface(Typeface.SANS_SERIF);
+        } else if ("serif".equals(mHeaderTextTypeface)){
+            mHeaderTextPaint.setTypeface(Typeface.SERIF);
+        } else if ("monospace".equals(mHeaderTextTypeface)){
+            mHeaderTextPaint.setTypeface(Typeface.MONOSPACE);
+        }
 
         // Prepare header background paint.
         mHeaderBackgroundPaint = new Paint();
