@@ -15,6 +15,7 @@ public class WeekViewEvent {
     private Calendar mStartTime;
     private Calendar mEndTime;
     private String mName;
+    private String mDescription = "";
     private String mLocation;
     private int mColor;
     private boolean mAllDay;
@@ -217,5 +218,13 @@ public class WeekViewEvent {
         }
 
         return events;
+    }
+
+    public void setDescription(String description) {
+        this.mDescription = description;
+    }
+
+    public String getDescription() {
+        return mDescription;
     }
 }
