@@ -127,7 +127,7 @@ public class WeekView extends View {
     private int mTodayBackgroundColor = Color.rgb(239, 247, 254);
     private int mHourSeparatorHeight = 2;
     private int mTodayHeaderTextColor = Color.rgb(39, 137, 228);
-    private int mEventTextSize = 12;
+    private int mEventTextSize = 10;
     private int mEventTextColor = Color.BLACK;
     private int mEventPadding = 8;
     private int mHeaderColumnBackgroundColor = Color.WHITE;
@@ -877,7 +877,7 @@ public class WeekView extends View {
                             bottom > mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom
                             ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getBackgroundColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getBackgroundColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }
@@ -921,7 +921,7 @@ public class WeekView extends View {
                             bottom > 0
                             ) {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
-                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
+                        mEventBackgroundPaint.setColor(mEventRects.get(i).event.getBackgroundColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getBackgroundColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     }
@@ -950,22 +950,35 @@ public class WeekView extends View {
         if (event.getName() != null) {
             bob.append(event.getName());
             bob.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, bob.length(), 0);
-            bob.append(event.getDescription());
-            bob.append(' ');
+            bob.append("\n" + event.getDescription() + "\n");
         }
 
         // Prepare the location of the event.
         if (event.getLocation() != null) {
-            bob.append(event.getLocation());
+            bob.append(" (" + event.getLocation() + ")");
         }
 
         int availableHeight = (int) (rect.bottom - originalTop - mEventPadding * 2);
         int availableWidth = (int) (rect.right - originalLeft - mEventPadding * 2);
 
+        if (event.getTextColor()!=null){
+            mEventTextPaint.setColor(event.getTextColor());
+        }
         // Get text dimensions.
         StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
         int lineHeight = textLayout.getHeight() / textLayout.getLineCount();
+
+        // if showing 4 sections per hour (quarter hours), box height for events 30 minutes or greater guarantee at
+        // least 1 line per variable whose text is to be displayed
+        if (showQuarterHours && event.getDurationInMinutes() >= 30) {
+
+            int totalLines = event.getName() != null ? 1 : 0;
+            totalLines += event.getDescription() != null ? 1 : 0;
+            totalLines += event.getLocation() != null ? 1 : 0;
+
+            availableHeight = lineHeight * totalLines;
+        }
 
         if (availableHeight >= lineHeight) {
             // Calculate available number of line counts.

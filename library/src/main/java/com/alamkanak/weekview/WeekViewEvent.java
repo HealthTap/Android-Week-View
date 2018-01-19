@@ -3,22 +3,27 @@ package com.alamkanak.weekview;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import static com.alamkanak.weekview.WeekViewUtil.*;
+import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
  * Website: http://april-shower.com
  */
 public class WeekViewEvent {
+
     private long mId;
     private Calendar mStartTime;
     private Calendar mEndTime;
     private String mName;
     private String mDescription = "";
     private String mLocation;
-    private int mColor;
+    private int mBackgroundColor;
+    private Integer mTextColor;
     private boolean mAllDay;
+    private Long mDuration;
+    private Long mDurationInMinutes;
 
     public WeekViewEvent(){
 
@@ -133,12 +138,20 @@ public class WeekViewEvent {
         this.mLocation = location;
     }
 
-    public int getColor() {
-        return mColor;
+    public int getBackgroundColor() {
+        return mBackgroundColor;
     }
 
-    public void setColor(int color) {
-        this.mColor = color;
+    public void setBackgroundColor(int color) {
+        this.mBackgroundColor = color;
+    }
+
+    public Integer getTextColor() {
+        return mTextColor;
+    }
+
+    public void setTextColor(int mTextColor) {
+        this.mTextColor = mTextColor;
     }
 
     public boolean isAllDay() {
@@ -155,6 +168,20 @@ public class WeekViewEvent {
 
     public void setId(long id) {
         this.mId = id;
+    }
+
+    public long getDuration(){
+        if (mDuration == null){
+            mDuration = Math.abs(mEndTime.getTimeInMillis() - mStartTime.getTimeInMillis());
+        }
+        return mDuration;
+    }
+
+    public long getDurationInMinutes(){
+        if (mDurationInMinutes == null) {
+            mDurationInMinutes = TimeUnit.MILLISECONDS.toMinutes(getDuration());;
+        }
+        return mDurationInMinutes;
     }
 
     @Override
@@ -184,7 +211,7 @@ public class WeekViewEvent {
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
             WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay());
-            event1.setColor(this.getColor());
+            event1.setBackgroundColor(this.getBackgroundColor());
             events.add(event1);
 
             // Add other days.
@@ -198,7 +225,7 @@ public class WeekViewEvent {
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
                 WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(), null, overDay, endOfOverDay, this.isAllDay());
-                eventMore.setColor(this.getColor());
+                eventMore.setBackgroundColor(this.getBackgroundColor());
                 events.add(eventMore);
 
                 // Add next day.
@@ -210,7 +237,7 @@ public class WeekViewEvent {
             startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
             WeekViewEvent event2 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), startTime, this.getEndTime(), this.isAllDay());
-            event2.setColor(this.getColor());
+            event2.setBackgroundColor(this.getBackgroundColor());
             events.add(event2);
         }
         else{
