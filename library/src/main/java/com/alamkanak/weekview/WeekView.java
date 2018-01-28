@@ -407,7 +407,7 @@ public class WeekView extends View {
         // Measure settings for header row.
         mHeaderTextPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mHeaderTextPaint.setColor(mHeaderColumnTextColor);
-        mHeaderTextPaint.setTextAlign(Paint.Align.CENTER);
+        mHeaderTextPaint.setTextAlign(Paint.Align.LEFT);
         mHeaderTextPaint.setTextSize(mTextSize);
         mHeaderTextPaint.getTextBounds(exampleTime, 0, exampleTime.length(), rect);
         mHeaderTextHeight = rect.height();
