@@ -151,7 +151,7 @@ public class WeekView extends View {
     private int mAllDayEventHeight = 100;
     private int mScrollDuration = 250;
     private boolean mHeaderTextTypeface;
-
+    private boolean swipable = true;
 
     // use this factor to multiply hour-fields in order to get half-hours or quarter-hours to show up
     private final int factor;
@@ -213,6 +213,7 @@ public class WeekView extends View {
             switch (mCurrentScrollDirection) {
                 case LEFT:
                 case RIGHT:
+                    if (!swipable) return true;
                     mCurrentOrigin.x -= distanceX * mXScrollingSpeed;
                     ViewCompat.postInvalidateOnAnimation(WeekView.this);
                     break;
@@ -228,6 +229,7 @@ public class WeekView extends View {
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (mIsZooming)
                 return true;
+            mCurrentFlingDirection = mCurrentScrollDirection;
 
             if ((mCurrentFlingDirection == Direction.LEFT && !mHorizontalFlingEnabled) ||
                     (mCurrentFlingDirection == Direction.RIGHT && !mHorizontalFlingEnabled) ||
@@ -237,7 +239,6 @@ public class WeekView extends View {
 
             mScroller.forceFinished(true);
 
-            mCurrentFlingDirection = mCurrentScrollDirection;
             switch (mCurrentFlingDirection) {
                 case LEFT:
                 case RIGHT:
@@ -1308,6 +1309,14 @@ public class WeekView extends View {
     //      Functions related to setting and getting the properties.
     //
     /////////////////////////////////////////////////////////////////
+
+    /**
+     * @param isSwipable true if view can swipe left/right
+     */
+    public void enableSwipe(boolean isSwipable) {
+        swipable = isSwipable;
+        setHorizontalFlingEnabled(isSwipable);
+    }
 
     public void setOnEventClickListener (EventClickListener listener) {
         this.mEventClickListener = listener;
