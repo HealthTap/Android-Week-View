@@ -23,6 +23,7 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
@@ -981,25 +982,29 @@ public class WeekView extends View {
 
             availableHeight = lineHeight * totalLines;
         }
-
+        int eventPaddingLeftRight = mEventPadding;
+        int eventPaddingTopBottom = event.getDurationInMinutes() < 30 ? 1 : mEventPadding;
         if (availableHeight >= lineHeight) {
             // Calculate available number of line counts.
             int availableLineCount = availableHeight / lineHeight;
+
             do {
                 // Ellipsize text to fit into event rect.
-                textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - mEventPadding * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
+                textLayout = new StaticLayout(TextUtils.ellipsize(bob, mEventTextPaint, availableLineCount * availableWidth, TextUtils.TruncateAt.END), mEventTextPaint, (int) (rect.right - originalLeft - eventPaddingLeftRight * 2), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
 
                 // Reduce line count.
                 availableLineCount--;
 
+                // Draw text.
+                canvas.save();
+                canvas.translate(originalLeft + eventPaddingLeftRight, originalTop + eventPaddingTopBottom);
+                textLayout.draw(canvas);
+                canvas.restore();
+
                 // Repeat until text is short enough.
             } while (textLayout.getHeight() > availableHeight);
 
-            // Draw text.
-            canvas.save();
-            canvas.translate(originalLeft + mEventPadding, originalTop + mEventPadding);
-            textLayout.draw(canvas);
-            canvas.restore();
+
         }
     }
 

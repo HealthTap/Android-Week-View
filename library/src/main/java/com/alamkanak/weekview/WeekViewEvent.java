@@ -13,6 +13,7 @@ import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
  */
 public class WeekViewEvent {
 
+
     private long mId;
     private Calendar mStartTime;
     private Calendar mEndTime;
@@ -24,6 +25,7 @@ public class WeekViewEvent {
     private boolean mAllDay;
     private Long mDuration;
     private Long mDurationInMinutes;
+    private String externalResourceId;
 
     public WeekViewEvent(){
 
@@ -94,6 +96,10 @@ public class WeekViewEvent {
         this(id, name, location, startTime, endTime, false);
     }
 
+    public WeekViewEvent(long weekViewId, String externalResourceId, String name, String location, Calendar startTime, Calendar endTime) {
+        this(weekViewId, name, location, startTime, endTime, false);
+        this.externalResourceId = externalResourceId;
+    }
     /**
      * Initializes the event for week view.
      * @param id The id of the event.
@@ -104,6 +110,7 @@ public class WeekViewEvent {
     public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime) {
         this(id, name, null, startTime, endTime);
     }
+
 
 
     public Calendar getStartTime() {
@@ -168,6 +175,10 @@ public class WeekViewEvent {
 
     public void setId(long id) {
         this.mId = id;
+    }
+
+    public String getExternalResourceId() {
+        return externalResourceId;
     }
 
     public long getDuration(){
