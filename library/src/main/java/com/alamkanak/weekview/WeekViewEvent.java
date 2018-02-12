@@ -96,10 +96,6 @@ public class WeekViewEvent {
         this(id, name, location, startTime, endTime, false);
     }
 
-    public WeekViewEvent(long weekViewId, String externalResourceId, String name, String location, Calendar startTime, Calendar endTime) {
-        this(weekViewId, name, location, startTime, endTime, false);
-        this.externalResourceId = externalResourceId;
-    }
     /**
      * Initializes the event for week view.
      * @param id The id of the event.
@@ -175,6 +171,10 @@ public class WeekViewEvent {
 
     public void setId(long id) {
         this.mId = id;
+    }
+
+    public void setExternalResourceId(String externalResourceId) {
+        this.externalResourceId = externalResourceId;
     }
 
     public String getExternalResourceId() {
