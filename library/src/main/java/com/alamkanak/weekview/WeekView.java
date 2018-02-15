@@ -951,13 +951,13 @@ public class WeekView extends View {
             bob.append(event.getName());
             bob.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, bob.length(), 0);
             if (event.getDescription() != null) {
-                bob.append("\n" + event.getDescription());
+                bob.append("\n").append(event.getDescription());
             }
         }
 
         // Prepare the location of the event.
         if (event.getLocation() != null) {
-            bob.append("\n" + event.getLocation());
+            bob.append("\n").append(event.getLocation());
         }
 
         int availableHeight = (int) (rect.bottom - originalTop - mEventPadding * 2);

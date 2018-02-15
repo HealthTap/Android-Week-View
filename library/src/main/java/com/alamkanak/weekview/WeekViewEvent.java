@@ -17,9 +17,9 @@ public class WeekViewEvent {
     private long mId;
     private Calendar mStartTime;
     private Calendar mEndTime;
-    private String mName;
-    private String mDescription = "";
-    private String mLocation;
+    private CharSequence mName;
+    private CharSequence mDescription = "";
+    private CharSequence mLocation;
     private int mBackgroundColor;
     private Integer mTextColor;
     private boolean mAllDay;
@@ -75,7 +75,7 @@ public class WeekViewEvent {
      * @param endTime The time when the event ends.
      * @param allDay Is the event an all day event.
      */
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean allDay) {
+    public WeekViewEvent(long id, CharSequence name, CharSequence location, Calendar startTime, Calendar endTime, boolean allDay) {
         this.mId = id;
         this.mName = name;
         this.mLocation = location;
@@ -92,7 +92,7 @@ public class WeekViewEvent {
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime) {
+    public WeekViewEvent(long id, CharSequence name, CharSequence location, Calendar startTime, Calendar endTime) {
         this(id, name, location, startTime, endTime, false);
     }
 
@@ -103,7 +103,7 @@ public class WeekViewEvent {
      * @param startTime The time when the event starts.
      * @param endTime The time when the event ends.
      */
-    public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime) {
+    public WeekViewEvent(long id, CharSequence name, Calendar startTime, Calendar endTime) {
         this(id, name, null, startTime, endTime);
     }
 
@@ -125,19 +125,27 @@ public class WeekViewEvent {
         this.mEndTime = endTime;
     }
 
-    public String getName() {
+    public CharSequence getName() {
         return mName;
     }
 
-    public void setName(String name) {
+    public void setName(CharSequence name) {
         this.mName = name;
     }
 
-    public String getLocation() {
+    public void setDescription(CharSequence description) {
+        this.mDescription = description;
+    }
+
+    public CharSequence getDescription() {
+        return mDescription;
+    }
+
+    public CharSequence getLocation() {
         return mLocation;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(CharSequence location) {
         this.mLocation = location;
     }
 
@@ -256,13 +264,5 @@ public class WeekViewEvent {
         }
 
         return events;
-    }
-
-    public void setDescription(String description) {
-        this.mDescription = description;
-    }
-
-    public String getDescription() {
-        return mDescription;
     }
 }
