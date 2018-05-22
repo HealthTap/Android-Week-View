@@ -2067,6 +2067,7 @@ public class WeekView extends View {
      * @param date The date to show.
      */
     public void goToDate(Calendar date) {
+        date = (Calendar) date.clone();
         mScroller.forceFinished(true);
         mCurrentScrollDirection = mCurrentFlingDirection = Direction.NONE;
 
