@@ -23,7 +23,9 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
+import android.view.DragEvent;
 import android.view.GestureDetector;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
@@ -86,6 +88,7 @@ public class WeekView extends View {
     private Paint mNowLinePaint;
     private Paint mTodayHeaderTextPaint;
     private Paint mEventBackgroundPaint;
+    private Paint mDragHighlightPaint;
     private float mHeaderColumnWidth;
     private List<EventRect> mEventRects;
     private List<? extends WeekViewEvent> mPreviousPeriodEvents;
@@ -157,6 +160,9 @@ public class WeekView extends View {
 
     // use this factor to multiply hour-fields in order to get half-hours or quarter-hours to show up
     private final int factor;
+    private float dragX;
+    private float dragY;
+    private int dragDurationMin;
 
     // Listeners.
     private EventClickListener mEventClickListener;
@@ -475,6 +481,18 @@ public class WeekView extends View {
         mEventTextPaint.setColor(mEventTextColor);
         mEventTextPaint.setTextSize(mEventTextSize);
 
+        // Prepare drag highlight color
+        int highlightColor;
+        final TypedArray ta = getContext().obtainStyledAttributes(new int[] {R.attr.colorAccent});
+        try {
+            highlightColor = ta.getColor(0, 0x80333333);
+        } finally {
+            ta.recycle();
+        }
+        mDragHighlightPaint = new Paint();
+        mDragHighlightPaint.setColor(highlightColor);
+        mDragHighlightPaint.setAlpha(0x80);
+
         // Set default event color.
 
         mScaleDetector = new ScaleGestureDetector(mContext, new ScaleGestureDetector.OnScaleGestureListener() {
@@ -533,6 +551,9 @@ public class WeekView extends View {
 
         // Draw the time column and all the axes/separators.
         drawTimeColumnAndAxes(canvas);
+
+        // Draw onDrag highlight
+        drawOnDragHighlight(canvas);
     }
 
     private void calculateHeaderHeight() {
@@ -809,6 +830,27 @@ public class WeekView extends View {
 
     }
 
+    private void drawOnDragHighlight(Canvas canvas) {
+        if (dragX == 0 && dragY == 0) return;
+
+        int leftDaysWithGaps = (int) -(Math.ceil(mCurrentOrigin.x / (mWidthPerDay + mColumnGap)));
+        float startPixel = mCurrentOrigin.x + (mWidthPerDay + mColumnGap) * leftDaysWithGaps +
+            mHeaderColumnWidth;
+        for (int dayNumber = leftDaysWithGaps + 1;
+             dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
+             dayNumber++) {
+            float start = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
+            if (mWidthPerDay + startPixel - start > 0 && dragX > start && dragX < startPixel + mWidthPerDay) {
+                float height = dragDurationMin / 60.0F * mHourHeight * factor;
+                RectF rect = new RectF(start, dragY, start + mWidthPerDay, dragY + height);
+                canvas.clipRect(rect, Region.Op.REPLACE);
+                canvas.drawRect(rect, mDragHighlightPaint);
+                break;
+            }
+            startPixel += mWidthPerDay + mColumnGap;
+        }
+    }
+
     /**
      * Get the time and date where the user clicked on.
      *
@@ -1016,7 +1058,7 @@ public class WeekView extends View {
      * stored in "originalEvent". But the event that corresponds to rectangle the rectangle
      * instance will be stored in "event".
      */
-    private class EventRect {
+    private static class EventRect {
         public WeekViewEvent event;
         public WeekViewEvent originalEvent;
         public RectF rectF;
@@ -1979,6 +2021,31 @@ public class WeekView extends View {
         }
 
         return val;
+    }
+
+    @Override
+    public boolean dispatchDragEvent(DragEvent event) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
+                Log.d("WeekView", event.toString());
+                if (event.getLocalState() instanceof Integer) {
+                    dragDurationMin = (int) event.getLocalState();
+                } else {
+                    dragDurationMin = 15;
+                }
+                dragX = event.getX();
+                dragY = event.getY();
+                invalidate();
+            } else if (event.getAction() == DragEvent.ACTION_DRAG_ENDED
+                || event.getAction() == DragEvent.ACTION_DRAG_EXITED
+                || event.getAction() == DragEvent.ACTION_DROP) {
+                dragX = 0;
+                dragY = 0;
+                dragDurationMin = 0;
+                invalidate();
+            }
+        }
+        return super.dispatchDragEvent(event);
     }
 
     private void goToNearestOrigin() {
