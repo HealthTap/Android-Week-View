@@ -2027,7 +2027,6 @@ public class WeekView extends View {
     public boolean dispatchDragEvent(DragEvent event) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
-                Log.d("WeekView", event.toString());
                 if (event.getLocalState() instanceof Integer) {
                     dragDurationMin = (int) event.getLocalState();
                 } else {
