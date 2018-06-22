@@ -712,7 +712,7 @@ public class WeekView extends View {
         // Clear the cache for event rectangles.
         if (mEventRects != null) {
             for (EventRect eventRect : mEventRects) {
-                eventRect.rectF = null;
+                eventRect.rectF.set(0, 0, 0, 0);
             }
         }
 
@@ -840,11 +840,11 @@ public class WeekView extends View {
              dayNumber <= leftDaysWithGaps + mNumberOfVisibleDays + 1;
              dayNumber++) {
             float start = (startPixel < mHeaderColumnWidth ? mHeaderColumnWidth : startPixel);
-            if (mWidthPerDay + startPixel - start > 0 && dragX > start && dragX < startPixel + mWidthPerDay) {
+            if (mWidthPerDay + startPixel - start > 0 && dragX > start && dragX < startPixel + mWidthPerDay
+                && dragY > getTop() + mHeaderHeight) {
                 float height = dragDurationMin / 60.0F * mHourHeight * factor;
-                RectF rect = new RectF(start, dragY, start + mWidthPerDay, dragY + height);
-                canvas.clipRect(rect, Region.Op.REPLACE);
-                canvas.drawRect(rect, mDragHighlightPaint);
+                canvas.clipRect(start, dragY, start + mWidthPerDay, dragY + height, Region.Op.REPLACE);
+                canvas.drawRect(start, dragY, start + mWidthPerDay, dragY + height, mDragHighlightPaint);
                 break;
             }
             startPixel += mWidthPerDay + mColumnGap;
@@ -918,12 +918,12 @@ public class WeekView extends View {
                         right > mHeaderColumnWidth &&
                         bottom > mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom
                         ) {
-                        mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
+                        mEventRects.get(i).rectF.set(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getBackgroundColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getBackgroundColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     } else
-                        mEventRects.get(i).rectF = null;
+                        mEventRects.get(i).rectF.set(0, 0, 0, 0);
                 }
             }
         }
@@ -962,12 +962,12 @@ public class WeekView extends View {
                         right > mHeaderColumnWidth &&
                         bottom > 0
                         ) {
-                        mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
+                        mEventRects.get(i).rectF.set(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getBackgroundColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getBackgroundColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
                     } else
-                        mEventRects.get(i).rectF = null;
+                        mEventRects.get(i).rectF.set(0, 0, 0, 0);
                 }
             }
         }
@@ -1081,7 +1081,7 @@ public class WeekView extends View {
          */
         public EventRect(WeekViewEvent event, WeekViewEvent originalEvent, RectF rectF) {
             this.event = event;
-            this.rectF = rectF;
+            this.rectF = new RectF(rectF);
             this.originalEvent = originalEvent;
         }
     }
