@@ -8,15 +8,8 @@ import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Region;
 import android.graphics.Typeface;
 import android.os.Build;
-import androidx.annotation.Nullable;
-import androidx.core.view.GestureDetectorCompat;
-import androidx.core.view.ViewCompat;
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
-import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
-
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
@@ -35,6 +28,11 @@ import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
+
+import androidx.annotation.Nullable;
+import androidx.core.view.GestureDetectorCompat;
+import androidx.core.view.ViewCompat;
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -590,7 +588,9 @@ public class WeekView extends View {
         canvas.drawRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), mHeaderColumnBackgroundPaint);
 
         // Clip to paint in left column only.
-        canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight(), Region.Op.REPLACE);
+        canvas.save();
+        canvas.clipRect(0, mHeaderHeight + mHeaderRowPadding * 2, mHeaderColumnWidth, getHeight());
+        canvas.restore();
 
         int numPeriodsInDay = 24 * factor;
 
@@ -718,7 +718,10 @@ public class WeekView extends View {
         }
 
         // Clip to paint events only.
-        canvas.clipRect(mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2, getWidth(), getHeight(), Region.Op.REPLACE);
+
+        canvas.save();
+        canvas.clipRect(mHeaderColumnWidth, mHeaderHeight + mHeaderRowPadding * 2 + mHeaderMarginBottom + mTimeTextHeight / 2, getWidth(), getHeight());
+        canvas.restore();
 
         // Iterate through each day.
         Calendar oldFirstVisibleDay = mFirstVisibleDay;
@@ -803,11 +806,15 @@ public class WeekView extends View {
         }
 
         // Hide everything in the first cell (top left corner).
-        canvas.clipRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
+        canvas.save();
+        canvas.clipRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2);
+        canvas.restore();
         canvas.drawRect(0, 0, mTimeTextWidth + mHeaderColumnPadding * 2, mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
 
         // Clip to paint header row only.
-        canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, Region.Op.REPLACE);
+        canvas.save();
+        canvas.clipRect(mHeaderColumnWidth, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2);
+        canvas.restore();
 
         // Draw the header background.
         canvas.drawRect(0, 0, getWidth(), mHeaderHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
@@ -844,7 +851,9 @@ public class WeekView extends View {
             if (mWidthPerDay + startPixel - start > 0 && dragX > start && dragX < startPixel + mWidthPerDay
                 && dragY > getTop() + mHeaderHeight) {
                 float height = dragDurationMin / 60.0F * mHourHeight * factor;
-                canvas.clipRect(start, dragY, start + mWidthPerDay, dragY + height, Region.Op.REPLACE);
+                canvas.save();
+                canvas.clipRect(start, dragY, start + mWidthPerDay, dragY + height);
+                canvas.restore();
                 canvas.drawRect(start, dragY, start + mWidthPerDay, dragY + height, mDragHighlightPaint);
                 break;
             }
