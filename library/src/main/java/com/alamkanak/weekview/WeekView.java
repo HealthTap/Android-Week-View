@@ -1317,6 +1317,11 @@ public class WeekView extends View {
                     EventRect eventRect = column.get(i);
                     eventRect.width = 1f / columns.size();
                     eventRect.left = j / columns.size();
+                    if (WeekViewEvent.OFFICE_HOUR.equals(eventRect.event.getEventType())
+                            || WeekViewEvent.TIME_OFF.equals(eventRect.event.getEventType())) {
+                        eventRect.width = 1f;
+                        eventRect.left = 0;
+                    }
                     if (!eventRect.event.isAllDay()) {
                         eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getStartTime().get(Calendar.MINUTE);
                         eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);
