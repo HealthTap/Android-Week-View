@@ -831,7 +831,14 @@ public class WeekView extends View {
             String dayLabel = getDateTimeInterpreter().interpretDate(day);
             if (dayLabel == null)
                 throw new IllegalStateException("A DateTimeInterpreter must not return null date");
-            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+//            canvas.drawText(dayLabel, startPixel + mWidthPerDay / 2, mHeaderTextHeight + mHeaderRowPadding, sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint);
+            float x = startPixel + mWidthPerDay / 2;
+            float y = mHeaderTextHeight + mHeaderRowPadding;
+            Paint paint = sameDay ? mTodayHeaderTextPaint : mHeaderTextPaint;
+            for (String line: dayLabel.split("\n")) {
+                canvas.drawText(line, x, y, paint);
+                y += paint.descent() - paint.ascent();
+            }
             drawAllDayEvents(day, startPixel, canvas);
             startPixel += mWidthPerDay + mColumnGap;
         }
