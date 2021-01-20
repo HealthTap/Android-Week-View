@@ -1331,7 +1331,11 @@ public class WeekView extends View {
                     }
                     if (!eventRect.event.isAllDay()) {
                         eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getStartTime().get(Calendar.MINUTE);
-                        eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);
+                        if (eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) == 0 && eventRect.event.getEndTime().get(Calendar.MINUTE) == 0) {
+                            eventRect.bottom = 24 * 60;
+                        } else {
+                            eventRect.bottom = eventRect.event.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getEndTime().get(Calendar.MINUTE);
+                        }
                     } else {
                         eventRect.top = 0;
                         eventRect.bottom = mAllDayEventHeight;
