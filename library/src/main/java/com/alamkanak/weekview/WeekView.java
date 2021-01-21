@@ -172,6 +172,16 @@ public class WeekView extends View {
     private DateTimeInterpreter mDateTimeInterpreter;
     private ScrollListener mScrollListener;
 
+    private boolean checkedVirtualVisit = true;
+    private boolean checkedOfficeHours = true;
+    private boolean checkedTimeOff = true;
+
+    public void setFilter(boolean checkedOfficeHours, boolean checkedTimeOff, boolean checkedVirtualVisit){
+        this.checkedOfficeHours = checkedOfficeHours;
+        this.checkedTimeOff = checkedTimeOff;
+        this.checkedVirtualVisit = checkedVirtualVisit;
+    }
+
     private final GestureDetector.SimpleOnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
 
         @Override
@@ -911,6 +921,15 @@ public class WeekView extends View {
 
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int i = 0; i < mEventRects.size(); i++) {
+                if (WeekViewEvent.OFFICE_HOUR.equals(mEventRects.get(i).event.getEventType()) && !checkedOfficeHours){
+                    continue;
+                }
+                if (WeekViewEvent.TIME_OFF.equals(mEventRects.get(i).event.getEventType()) && !checkedTimeOff){
+                    continue;
+                }
+                if (WeekViewEvent.APPOINTMENT.equals(mEventRects.get(i).event.getEventType()) && !checkedVirtualVisit){
+                    continue;
+                }
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()) {
 
                     // Calculate top.

@@ -14,6 +14,7 @@ import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
 public class WeekViewEvent {
     public static String OFFICE_HOUR = "office_hour";
     public static String TIME_OFF = "time_off";
+    public static String APPOINTMENT = "appointment";
     private long mId;
     private Calendar mStartTime;
     private Calendar mEndTime;
