@@ -281,9 +281,11 @@ public class WeekView extends View {
                     if (event.rectF != null && event.rectF.contains(e.getX(), e.getY())) {
                         mEventClickListener.onEventClick(event.originalEvent, event.rectF);
                         playSoundEffect(SoundEffectConstants.CLICK);
+                        Collections.reverse(reversedEventRects);
                         return super.onSingleTapConfirmed(e);
                     }
                 }
+                Collections.reverse(reversedEventRects);
             }
 
             // If the tap was on in an empty space, then trigger the callback.
@@ -309,9 +311,11 @@ public class WeekView extends View {
                     if (event.rectF != null && event.rectF.contains(e.getX(), e.getY())) {
                         mEventLongPressListener.onEventLongPress(event.originalEvent, event.rectF);
                         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                        Collections.reverse(reversedEventRects);
                         return;
                     }
                 }
+                Collections.reverse(reversedEventRects);
             }
 
             // If the tap was on in an empty space, then trigger the callback.
