@@ -12,8 +12,8 @@ import static com.alamkanak.weekview.WeekViewUtil.isSameDay;
  * Website: http://april-shower.com
  */
 public class WeekViewEvent {
-    public static String OFFICE_HOUR_TITLE = "Office Hours";
-    public static String TIME_OFF_TITLE = "Time Off";
+    public static String OFFICE_HOUR_TITLE = "Office hours";
+    public static String TIME_OFF_TITLE = "Out of office";
     public static String OFFICE_HOUR = "office_hour";
     public static String TIME_OFF = "time_off";
     public static String APPOINTMENT = "appointment";
