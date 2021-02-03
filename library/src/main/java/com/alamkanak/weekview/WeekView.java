@@ -1262,6 +1262,11 @@ public class WeekView extends View {
                     long end1 = event1.getEndTime().getTimeInMillis();
                     long end2 = event2.getEndTime().getTimeInMillis();
                     comparator = end1 > end2 ? 1 : (end1 < end2 ? -1 : 0);
+                    if (comparator == 0){
+                        if (WeekViewEvent.APPOINTMENT.equals(event2.getEventType())){
+                            comparator = -1;
+                        }
+                    }
                 }
                 return comparator;
             }
