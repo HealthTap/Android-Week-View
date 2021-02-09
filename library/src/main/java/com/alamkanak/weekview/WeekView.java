@@ -2127,7 +2127,7 @@ public class WeekView extends View {
             // Stop current animation.
             mScroller.forceFinished(true);
             // Snap to date.
-            mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, -nearestOrigin, 0, (int) (Math.abs(nearestOrigin) / mWidthPerDay * mScrollDuration));
+            mScroller.startScroll((int) mCurrentOrigin.x, (int) mCurrentOrigin.y, -(nearestOrigin+5), 0, (int) (Math.abs(nearestOrigin) / mWidthPerDay * mScrollDuration));
             ViewCompat.postInvalidateOnAnimation(WeekView.this);
         }
         // Reset scrolling and fling direction.
