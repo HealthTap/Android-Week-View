@@ -648,6 +648,11 @@ public class WeekView extends View {
             if (top < getHeight())
                 canvas.drawText(time, mTimeTextWidth + mHeaderColumnPadding, top + mTimeTextHeight, mTimeTextPaint);
         }
+
+        //Clear the top-right cornor to avoid hour and day overlapping
+        canvas.save();
+        canvas.drawRect(0, 0, mHeaderColumnWidth, mHeaderTextHeight + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        canvas.restore();
     }
 
     private void drawHeaderRowAndEvents(Canvas canvas) {
@@ -858,6 +863,10 @@ public class WeekView extends View {
             startPixel += mWidthPerDay + mColumnGap;
         }
 
+        //Clear the top-right cornor to avoid hour and day overlapping
+        canvas.save();
+        canvas.drawRect(0, 0, mHeaderColumnWidth, mHeaderHeight*2 + mHeaderRowPadding * 2, mHeaderBackgroundPaint);
+        canvas.restore();
     }
 
     private void drawOnDragHighlight(Canvas canvas) {
