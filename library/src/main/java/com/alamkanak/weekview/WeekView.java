@@ -1268,9 +1268,18 @@ public class WeekView extends View {
                 long start1 = event1.getStartTime().getTimeInMillis();
                 long start2 = event2.getStartTime().getTimeInMillis();
                 int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
-                if (comparator == 0){
-                    if (WeekViewEvent.APPOINTMENT.equals(event2.getEventType())){
+                if (comparator == 0){ //TimeOff and Office Hours
+                    if (WeekViewEvent.OFFICE_HOUR.equals(event1.getEventType()) && WeekViewEvent.TIME_OFF.equals(event2.getEventType())) {
                         comparator = -1;
+                    } else if (WeekViewEvent.TIME_OFF.equals(event1.getEventType()) && WeekViewEvent.OFFICE_HOUR.equals(event2.getEventType())) {
+                        comparator = 1;
+                    }
+                }
+                if (comparator == 0){ //Appointment and TimeOff/Office Hours
+                    if ((WeekViewEvent.OFFICE_HOUR.equals(event1.getEventType()) || WeekViewEvent.TIME_OFF.equals(event1.getEventType())) && WeekViewEvent.APPOINTMENT.equals(event2.getEventType())) {
+                        comparator = -1;
+                    } else if (WeekViewEvent.APPOINTMENT.equals(event1.getEventType()) && (WeekViewEvent.OFFICE_HOUR.equals(event2.getEventType()) || WeekViewEvent.TIME_OFF.equals(event2.getEventType()))) {
+                        comparator = 1;
                     }
                 }
                 if (comparator == 0) {
@@ -1356,6 +1365,8 @@ public class WeekView extends View {
         }
         for (int i = 0; i < maxRowCount; i++) {
             // Set the left and right values of the event.
+            float eventTotalWidth = 0.8f;//office hours 0.0-0.8, Time-off 0.1-0.9, Appointment 0.2-1.0
+            float eventWidth = eventTotalWidth / columns.size();
             float j = 0;
             for (List<EventRect> column : columns) {
                 if (column.size() >= i + 1) {
@@ -1363,12 +1374,14 @@ public class WeekView extends View {
                     eventRect.width = 1f / columns.size();
                     eventRect.left = j / columns.size();
                     if (WeekViewEvent.OFFICE_HOUR.equals(eventRect.event.getEventType())) {
-                        eventRect.width = 0.8f;
+                        eventRect.width = eventTotalWidth;
                         eventRect.left = 0;
-                    }
-                    if (WeekViewEvent.TIME_OFF.equals(eventRect.event.getEventType())) {
-                        eventRect.width = 0.8f;
+                    } else if (WeekViewEvent.TIME_OFF.equals(eventRect.event.getEventType())) {
+                        eventRect.width = eventTotalWidth;
                         eventRect.left = 0.1f;
+                    } else if (WeekViewEvent.APPOINTMENT.equals(eventRect.event.getEventType())) {
+                        eventRect.width = eventWidth;
+                        eventRect.left = 0.2f + (j * eventWidth);
                     }
                     if (!eventRect.event.isAllDay()) {
                         eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getStartTime().get(Calendar.MINUTE);
@@ -1401,7 +1414,8 @@ public class WeekView extends View {
         long end1 = event1.getEndTime().getTimeInMillis();
         long start2 = event2.getStartTime().getTimeInMillis();
         long end2 = event2.getEndTime().getTimeInMillis();
-        return !((start1 >= end2) || (end1 <= start2));
+        return (start1 == start2 && end1 == end2); //office-hour and time-off draw one upon another, Appointment will divide area if start time and end time will match as all appointment have same time ie. 30 mins
+//        return !((start1 >= end2) || (end1 <= start2));
     }
 
 
@@ -1585,6 +1599,11 @@ public class WeekView extends View {
      */
     public void setNumberOfVisibleDays(int numberOfVisibleDays) {
         this.mNumberOfVisibleDays = numberOfVisibleDays;
+        if (numberOfVisibleDays == 1){
+            setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 10, getResources().getDisplayMetrics()));
+        } else {
+            setEventTextSize((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 8, getResources().getDisplayMetrics()));
+        }
         mCurrentOrigin.x = 0;
         mCurrentOrigin.y = 0;
         invalidate();
