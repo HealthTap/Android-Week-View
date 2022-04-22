@@ -1066,10 +1066,16 @@ public class WeekView extends View {
         // if showing 4 sections per hour (quarter hours), box height for events 30 minutes or greater guarantee at
         // least 1 line per variable whose text is to be displayed
         if (cellUnit == CELL_UNIT_QUARTER_HOUR && event.getDurationInMinutes() >= 30) {
-
-            int totalLines = event.getName() != null ? 1 : 0;
-            totalLines += event.getDescription() != null ? 1 : 0;
-            totalLines += event.getLocation() != null ? 1 : 0;
+            int totalLines;
+            if (getNumberOfVisibleDays() == 1){
+                totalLines = event.getName() != null ? 1 : 0;
+                totalLines += event.getDescription() != null ? 1 : 0;
+                totalLines += event.getLocation() != null ? 1 : 0;
+            } else {
+                totalLines = event.getName() != null ? 2 : 0;
+                totalLines += event.getDescription() != null ? 2 : 0;
+                totalLines += event.getLocation() != null ? 1 : 0;
+            }
 
             availableHeight = lineHeight * totalLines;
         }
