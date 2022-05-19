@@ -1420,7 +1420,9 @@ public class WeekView extends View {
         long end1 = event1.getEndTime().getTimeInMillis();
         long start2 = event2.getStartTime().getTimeInMillis();
         long end2 = event2.getEndTime().getTimeInMillis();
-        return (start1 == start2 && end1 == end2); //office-hour and time-off draw one upon another, Appointment will divide area if start time and end time will match as all appointment have same time ie. 30 mins
+
+        boolean isAppointment = WeekViewEvent.APPOINTMENT.equals(event1.getEventType()) && WeekViewEvent.APPOINTMENT.equals(event2.getEventType());
+        return isAppointment && (start1 == start2 || end1 == end2); //office-hour and time-off draw one upon another, Appointment will divide area if start time and end time will match as all appointment have same time ie. 30 mins
 //        return !((start1 >= end2) || (end1 <= start2));
     }
 
