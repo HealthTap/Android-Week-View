@@ -1273,7 +1273,7 @@ public class WeekView extends View {
             public int compare(WeekViewEvent event1, WeekViewEvent event2) {
                 long start1 = event1.getStartTime().getTimeInMillis();
                 long start2 = event2.getStartTime().getTimeInMillis();
-                int comparator = start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
+                int comparator = 0;//start1 > start2 ? 1 : (start1 < start2 ? -1 : 0);
                 if (comparator == 0){ //TimeOff and Office Hours
                     if (WeekViewEvent.OFFICE_HOUR.equals(event1.getEventType()) && WeekViewEvent.TIME_OFF.equals(event2.getEventType())) {
                         comparator = -1;
