@@ -30,6 +30,8 @@ public class WeekViewEvent {
     private Long mDurationInMinutes;
     private String externalResourceId;
     private String mEventType;
+    private String mReservedFor;
+    private boolean isCancelled;
 
     /**
      * Initializes the event for week view.
@@ -76,7 +78,7 @@ public class WeekViewEvent {
      * @param allDay Is the event an all day event.
      * @param eventType Is the type of event.
      */
-    public WeekViewEvent(long id, CharSequence name, CharSequence location, Calendar startTime, Calendar endTime, boolean allDay, String eventType) {
+    public WeekViewEvent(long id, CharSequence name, CharSequence location, Calendar startTime, Calendar endTime, boolean allDay, String eventType, String reservedFor) {
         this.mId = id;
         this.mName = name;
         this.mLocation = location;
@@ -84,6 +86,7 @@ public class WeekViewEvent {
         this.mEndTime = endTime;
         this.mAllDay = allDay;
         this.mEventType = eventType;
+        this.mReservedFor = reservedFor;
     }
 
     /**
@@ -96,7 +99,7 @@ public class WeekViewEvent {
      * @param allDay Is the event an all day event.
      */
     public WeekViewEvent(long id, CharSequence name, CharSequence location, Calendar startTime, Calendar endTime, boolean allDay) {
-        this(id, name, location, startTime, endTime, allDay, null);
+        this(id, name, location, startTime, endTime, allDay, null, null);
     }
 
     /**
@@ -198,6 +201,18 @@ public class WeekViewEvent {
         this.mId = id;
     }
 
+    public String getReservedFor() {
+        return mReservedFor;
+    }
+
+    public boolean isCancelled() {
+        return isCancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        isCancelled = cancelled;
+    }
+
     public void setExternalResourceId(String externalResourceId) {
         this.externalResourceId = externalResourceId;
     }
@@ -246,7 +261,7 @@ public class WeekViewEvent {
             endTime = (Calendar) this.getStartTime().clone();
             endTime.set(Calendar.HOUR_OF_DAY, 23);
             endTime.set(Calendar.MINUTE, 59);
-            WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay(), this.mEventType);
+            WeekViewEvent event1 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), this.getStartTime(), endTime, this.isAllDay(), this.mEventType, this.mReservedFor);
             event1.setBackgroundColor(this.getBackgroundColor());
             events.add(event1);
 
@@ -272,7 +287,7 @@ public class WeekViewEvent {
             Calendar startTime = (Calendar) this.getEndTime().clone();
             startTime.set(Calendar.HOUR_OF_DAY, 0);
             startTime.set(Calendar.MINUTE, 0);
-            WeekViewEvent event2 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), startTime, this.getEndTime(), this.isAllDay(), this.mEventType);
+            WeekViewEvent event2 = new WeekViewEvent(this.getId(), this.getName(), this.getLocation(), startTime, this.getEndTime(), this.isAllDay(), this.mEventType, this.mReservedFor);
             event2.setBackgroundColor(this.getBackgroundColor());
             events.add(event2);
         }

@@ -9,13 +9,16 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Layout;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -30,6 +33,7 @@ import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
@@ -173,11 +177,11 @@ public class WeekView extends View {
     private ScrollListener mScrollListener;
 
     private boolean checkedVirtualVisit = true;
-    private boolean checkedOfficeHours = true;
+    private boolean cancelledVisit = true;
     private boolean checkedTimeOff = true;
 
-    public void setFilter(boolean checkedOfficeHours, boolean checkedTimeOff, boolean checkedVirtualVisit){
-        this.checkedOfficeHours = checkedOfficeHours;
+    public void setFilter(boolean canceledVisit, boolean checkedTimeOff, boolean checkedVirtualVisit){
+        this.cancelledVisit = canceledVisit;
         this.checkedTimeOff = checkedTimeOff;
         this.checkedVirtualVisit = checkedVirtualVisit;
     }
@@ -789,7 +793,9 @@ public class WeekView extends View {
                         canvas.drawRect(start, startY, startPixel + mWidthPerDay, getHeight(), futurePaint);
                     }
                 } else {
-                    canvas.drawRect(start, mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), sameDay ? mTodayBackgroundPaint : mDayBackgroundPaint);
+//                    Paint dayBackground = sameDay ? mTodayBackgroundPaint : mDayBackgroundPaint; // We don't want different color for today
+                    Paint dayBackground = mDayBackgroundPaint;
+                    canvas.drawRect(start, mHeaderHeight + mHeaderRowPadding * 2 + mTimeTextHeight / 2 + mHeaderMarginBottom, startPixel + mWidthPerDay, getHeight(), dayBackground);
                 }
             }
 
@@ -935,15 +941,20 @@ public class WeekView extends View {
 
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int i = 0; i < mEventRects.size(); i++) {
-                if (WeekViewEvent.OFFICE_HOUR.equals(mEventRects.get(i).event.getEventType()) && !checkedOfficeHours){
-                    continue;
-                }
                 if (WeekViewEvent.TIME_OFF.equals(mEventRects.get(i).event.getEventType()) && !checkedTimeOff){
                     continue;
                 }
-                if (WeekViewEvent.APPOINTMENT.equals(mEventRects.get(i).event.getEventType()) && !checkedVirtualVisit){
-                    continue;
+
+                if (WeekViewEvent.APPOINTMENT.equals(mEventRects.get(i).event.getEventType())){
+                    if (mEventRects.get(i).event.isCancelled()){
+                        if (!cancelledVisit)
+                            continue;
+                    } else {
+                        if (!checkedVirtualVisit)
+                            continue;
+                    }
                 }
+
                 if (isSameDay(mEventRects.get(i).event.getStartTime(), date) && !mEventRects.get(i).event.isAllDay()) {
 
                     // Calculate top.
@@ -1040,7 +1051,14 @@ public class WeekView extends View {
         // Prepare the name of the event.
         SpannableStringBuilder bob = new SpannableStringBuilder();
         if (event.getName() != null) {
-            bob.append(event.getName());
+            if (event.getEventType().equals(WeekViewEvent.OFFICE_HOUR)) {
+                bob.append("  \n");
+            }
+            if(!TextUtils.isEmpty(event.getReservedFor())){
+                bob.append("Reserved: "+event.getReservedFor());
+            } else {
+                bob.append(event.getName());
+            }
             bob.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0, bob.length(), 0);
             if (event.getDescription() != null) {
                 bob.append("\n").append(event.getDescription());
@@ -1057,6 +1075,13 @@ public class WeekView extends View {
 
         if (event.getTextColor() != null) {
             mEventTextPaint.setColor(event.getTextColor());
+        }
+        if (event.getEventType().equals(WeekViewEvent.OFFICE_HOUR)){
+            Drawable iconDrawable = TextUtils.isEmpty(event.getReservedFor())?
+                ContextCompat.getDrawable(mContext, R.drawable.ic_all_care) : ContextCompat.getDrawable(mContext, R.drawable.ic_reserved);
+            iconDrawable.setBounds(0, 0, iconDrawable.getIntrinsicWidth(), iconDrawable.getIntrinsicHeight());
+            ImageSpan imageSpan = new ImageSpan(iconDrawable, ImageSpan.ALIGN_BASELINE);
+            bob.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE); // Apply to the first character
         }
         // Get text dimensions.
         StaticLayout textLayout = new StaticLayout(bob, mEventTextPaint, availableWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
@@ -1371,7 +1396,7 @@ public class WeekView extends View {
         }
         for (int i = 0; i < maxRowCount; i++) {
             // Set the left and right values of the event.
-            float eventTotalWidth = 0.8f;//office hours 0.0-0.8, Time-off 0.1-0.9, Appointment 0.2-1.0
+            float eventTotalWidth = 0.9f;//office hours 0.0-0.8, Time-off 0.1-0.9, Appointment 0.2-1.0
             float eventWidth = eventTotalWidth / columns.size();
             float j = 0;
             for (List<EventRect> column : columns) {
@@ -1379,15 +1404,13 @@ public class WeekView extends View {
                     EventRect eventRect = column.get(i);
                     eventRect.width = 1f / columns.size();
                     eventRect.left = j / columns.size();
-                    if (WeekViewEvent.OFFICE_HOUR.equals(eventRect.event.getEventType())) {
+                    if (WeekViewEvent.OFFICE_HOUR.equals(eventRect.event.getEventType()) ||
+                            WeekViewEvent.TIME_OFF.equals(eventRect.event.getEventType())) {
                         eventRect.width = eventTotalWidth;
                         eventRect.left = 0;
-                    } else if (WeekViewEvent.TIME_OFF.equals(eventRect.event.getEventType())) {
-                        eventRect.width = eventTotalWidth;
-                        eventRect.left = 0.1f;
                     } else if (WeekViewEvent.APPOINTMENT.equals(eventRect.event.getEventType())) {
                         eventRect.width = eventWidth;
-                        eventRect.left = 0.2f + (j * eventWidth);
+                        eventRect.left = j * eventWidth;
                     }
                     if (!eventRect.event.isAllDay()) {
                         eventRect.top = eventRect.event.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + eventRect.event.getStartTime().get(Calendar.MINUTE);
